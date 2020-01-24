@@ -1,6 +1,9 @@
 import pyotp
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django_countries.fields import CountryField
+
+from app.models import Corporation
 
 
 class UserManager(BaseUserManager):
@@ -27,17 +30,37 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    phone_number = models.TextField(db_index=True, unique=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    otp_key = models.CharField(max_length=100, blank=True, null=True)
-    latest_otp = models.TextField(blank=True)  # For testing purposes only. MUST be removed for production.
+    phone_number = models.CharField(max_length=20, db_index=True, unique=True)
 
     USERNAME_FIELD = 'phone_number'
+
+    is_active = models.BooleanField(default=True)
+    otp_key = models.CharField(max_length=100, blank=True, null=True, verbose_name='OTP Generation Key')
+
+    USER_TYPES = (
+        ('A', 'Administrator'),
+        ('T', 'Tourist'),
+        ('O', 'Operator'),
+        ('M', 'Manager')
+    )
+
+    user_type = models.CharField(max_length=1, choices=USER_TYPES, default='T')
+
+    @property
+    def is_staff(self):
+        return self.user_type == 'A'
+
+    @is_staff.setter
+    def is_staff(self, value):
+        if value is True:
+            self.user_type = 'A'
+
+    corporation = models.ForeignKey(Corporation, on_delete=models.CASCADE, null=True, blank=True)
 
     first_name = models.TextField(blank=True)
     last_name = models.TextField(blank=True)
     avatar = models.ImageField(null=True, blank=True)
+    country = CountryField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'user'
