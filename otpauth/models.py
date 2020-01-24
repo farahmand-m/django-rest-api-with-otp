@@ -3,8 +3,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django_countries.fields import CountryField
 
-from app.models import Corporation
-
 
 class UserManager(BaseUserManager):
 
@@ -24,6 +22,10 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.save()
         return user
+
+
+class Corporation(models.Model):
+    label = models.TextField()
 
 
 class User(AbstractBaseUser, PermissionsMixin):

@@ -22,4 +22,5 @@ class UserAdminModel(admin.ModelAdmin):
 
 
 admin.site.unregister(Group)
+admin.site.register(auth_models.Corporation)
 admin.site.register(auth_models.User, UserAdminModel)
