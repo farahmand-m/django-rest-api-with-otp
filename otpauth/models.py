@@ -55,10 +55,5 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self
 
     def authenticate(self, otp):
-        provided_otp = 0
-        try:
-            provided_otp = int(otp)
-        except ValueError:
-            return False
         t = pyotp.TOTP(self.otp_key, interval=180)
-        return t.verify(provided_otp)
+        return t.verify(otp)
