@@ -170,3 +170,4 @@ dmypy.json
 
 # PyCharm Project Directory
 .idea
+/venv
