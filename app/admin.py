@@ -51,6 +51,7 @@ class OrderAdminModel(admin.ModelAdmin):
     inlines = [OrderedActivityInlineModel]
 
 
+admin.site.register(models.Transaction)
 admin.site.register(models.ImageGallery, ImageGalleryAdminModel)
 admin.site.register(models.Hotel, HotelAdminModel)
 admin.site.register(models.RentingCenter, RentingCenterAdminModel)

@@ -3,6 +3,12 @@ from django.db import models
 from otpauth.models import User, Corporation
 
 
+class Transaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    amount = models.IntegerField()
+
+
 class ImageGallery(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
@@ -12,59 +18,63 @@ class Image(models.Model):
     image = models.ImageField()
 
 
-class CorporateModel:
+class ServiceCenter(models.Model):
     corporation = models.ForeignKey(Corporation, on_delete=models.CASCADE)
-
-
-class HasLocation:
+    name = models.TextField()
+    description = models.TextField()
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    gallery = models.ForeignKey(ImageGallery, on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        abstract = True
 
 
-class Hotel(CorporateModel, HasLocation, models.Model):
-    name = models.TextField()
+class Hotel(ServiceCenter):
+    class Meta:
+        verbose_name = 'Hotel'
+        verbose_name_plural = 'Hotels'
+
+
+class RentingCenter(ServiceCenter):
+    class Meta:
+        verbose_name = 'Renting Center'
+        verbose_name_plural = 'Renting Centers'
+
+
+class MedicalFacility(ServiceCenter):
+    class Meta:
+        verbose_name = 'Medical Facility'
+        verbose_name_plural = 'Medical Facilities'
+
+
+class Service(models.Model):
+    available = models.BooleanField(default=False)
     description = models.TextField()
     gallery = models.ForeignKey(ImageGallery, on_delete=models.CASCADE, null=True, blank=True)
 
+    class Meta:
+        abstract = True
 
-class HotelRoom(models.Model):
+
+class HotelRoom(Service):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
-    available = models.BooleanField(default=False)
     beds = models.IntegerField()
     price = models.IntegerField()
-    description = models.TextField()
 
 
-class RentingCenter(CorporateModel, HasLocation, models.Model):
-    name = models.TextField()
-    description = models.TextField()
-    gallery = models.ForeignKey(ImageGallery, on_delete=models.CASCADE, null=True, blank=True)
-
-
-class Rental(models.Model):
+class Rental(Service):
     center = models.ForeignKey(RentingCenter, on_delete=models.CASCADE)
-    available = models.BooleanField(default=False)
     name = models.TextField()
-    description = models.TextField()
-    gallery = models.ForeignKey(ImageGallery, on_delete=models.CASCADE, null=True, blank=True)
     price = models.IntegerField()
 
 
-class MedicalFacility(CorporateModel, HasLocation, models.Model):
-    name = models.TextField()
-    description = models.TextField()
-    gallery = models.ForeignKey(ImageGallery, on_delete=models.CASCADE, null=True, blank=True)
-
-
-class MedicalService(models.Model):
+class MedicalService(Service):
     facility = models.ForeignKey(MedicalFacility, on_delete=models.CASCADE)
-    available = models.BooleanField(default=False)
     name = models.TextField()
-    description = models.TextField()
-    gallery = models.ForeignKey(ImageGallery, on_delete=models.CASCADE, null=True, blank=True)
 
 
-class Trip(CorporateModel, models.Model):
+class Trip(models.Model):
     available = models.BooleanField(default=False)
     available_until = models.DateTimeField()
     name = models.TextField()
@@ -75,11 +85,9 @@ class Trip(CorporateModel, models.Model):
     medical_facility = models.ForeignKey(MedicalFacility, on_delete=models.CASCADE, null=True, blank=True)
 
 
-class Activity(models.Model):
+class Activity(Service):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
     name = models.TextField()
-    description = models.TextField()
-    gallery = models.ForeignKey(ImageGallery, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class Order(models.Model):
