@@ -16,7 +16,6 @@ def request_otp(request):
         return HttpResponse(status=403)
     timestamped_otp = pyotp.TOTP(account.otp_key, interval=180)
     otp = timestamped_otp.now()
-    # TODO: The OTP needs to be sent to the user through SMS, etc.
     account.set_password(otp)
     account.save()
     return JsonResponse({'created': created})

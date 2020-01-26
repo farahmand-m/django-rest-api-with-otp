@@ -21,6 +21,12 @@ class UserAdminModel(admin.ModelAdmin):
     )
 
 
-admin.site.unregister(Group)
+class OTPAdminModel(admin.ModelAdmin):
+    fields = ('account', 'key', 'latest')
+    readonly_fields = ('account', 'latest')
+
+
+admin.site.unregister(Group)  # Not used
 admin.site.register(auth_models.Corporation)
 admin.site.register(auth_models.User, UserAdminModel)
+admin.site.register(auth_models.OTP, OTPAdminModel)
